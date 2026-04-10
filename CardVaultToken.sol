@@ -44,6 +44,14 @@ contract CardVaultToken is ERC20, Ownable, Pausable {
     ///         primary market event. Secondary trading occurs between rounds.
     uint256 public issuanceRound;
 
+    /// @notice Timestamp of the last NAV update.
+    ///         Allows holders to assess how stale the current valuation is.
+    uint256 public lastNAVUpdate;
+
+    /// @notice Timestamp of the last vault metadata update.
+    ///         Allows holders to assess how current the inventory records are.
+    uint256 public lastMetadataUpdate;
+
     // ─────────────────────────────────────────────
     //  Events
     // ─────────────────────────────────────────────
@@ -165,18 +173,21 @@ contract CardVaultToken is ERC20, Ownable, Pausable {
         require(_nav > 0, "NAV must be > 0");
         uint256 oldNAV = navPerToken;
         navPerToken = _nav;
+        lastNAVUpdate = block.timestamp;
         emit NAVUpdated(oldNAV, _nav);
     }
 
     /**
      * @notice Update the URI pointing to off-chain vault documentation.
-     * @dev    Allows the issuer to publish updated inventory lists,
-     *         revaluation reports, or new grading certificates without
-     *         redeploying the contract.
+     * @dev    The referenced document must include PSA/BGS certificate
+     *         numbers, grades, and certificate links for every card in
+     *         the vault. lastMetadataUpdate is recorded on-chain so
+     *         holders can assess how current the inventory records are.
      * @param newURI New metadata URI (e.g. IPFS or custodian portal).
      */
     function setVaultMetadataURI(string calldata newURI) external onlyOwner {
-        vaultMetadataURI = newURI;
+        vaultMetadataURI   = newURI;
+        lastMetadataUpdate = block.timestamp;
         emit VaultMetadataUpdated(newURI);
     }
 
@@ -190,6 +201,9 @@ contract CardVaultToken is ERC20, Ownable, Pausable {
      *      Transfers are otherwise permissionless — KYC/AML compliance
      *      is enforced off-chain at the platform and custodian level,
      *      preserving on-chain liquidity for secondary market trading.
+     *      Standard approve() and allowance() functions are inherited
+     *      from ERC20, enabling delegated transfers for DEX and
+     *      protocol integrations.
      */
     function _update(
         address from,
@@ -197,5 +211,14 @@ contract CardVaultToken is ERC20, Ownable, Pausable {
         uint256 amount
     ) internal override whenNotPaused {
         super._update(from, to, amount);
+    }
+
+    /**
+     * @notice Disabled. The vault always requires an active operator
+     *         to mint, update NAV, and process redemptions. Permanently
+     *         removing ownership would render the contract unmanageable.
+     */
+    function renounceOwnership() public pure override {
+        revert("Renouncing ownership is disabled");
     }
 }
