@@ -1,4 +1,4 @@
-# Pokémon Card Vault Token (PCVT) — Vault Metadata
+# Pokémon Card Vault Token (PCVT) — SAMPLE Vault Metadata
 
 **Document type:** vaultMetadataURI reference  
 **Issue date:** 10 April 2026  
