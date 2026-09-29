@@ -12,7 +12,7 @@ An ERC-20 smart contract representing fungible fractional ownership in a custodi
 | **Symbol** | PCVT |
 | **Decimals** | 18 |
 | **Network** | Ethereum Sepolia Testnet |
-| **Contract Address** | `0xD471BF2aebF9D8c3Ff3flAace20fbAb95daB9E87` |
+| **Contract Address** | `0xD471BF2aebF9D8c3Ff3f1Aace20fbAb95daB9E87` |
 | **Solidity Version** | ^0.8.20 |
 | **Standard** | ERC-20 (OpenZeppelin) |
 
